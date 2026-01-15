@@ -7,7 +7,9 @@ const product = {
     }
 };
 
-const createProductLabel = (product) =>
-    `Product: ${product.name} | Price: ${product.getFormattedPrice()}`;
+
+//UPD with destruct
+const createProductLabel = ({ name, getFormattedPrice }) => //product -> to { name, getFormattedPrice }
+    `Product: ${name} | Price: ${getFormattedPrice.call(product)}`;
 
 console.log(createProductLabel(product));
