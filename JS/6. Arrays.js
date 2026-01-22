@@ -9,27 +9,18 @@ const logMessages = [
 ];
 
 // 2 addLog(logs, newMessage):
-const addLog = (logs, newMessage) => {
-    const x = [...logs, newMessage];
-    return x;
-};
+const addLog = (logs, newMessage) => [...logs, newMessage]
 
 // 3 getErrorMessages(logs):
-const getErrorMessages = (logs) => {
-    const errorMessages = logs.filter(msg => msg.startsWith("[ERROR]"));
-    return errorMessages;
-};
+const getErrorMessages = logs => logs.filter(msg => msg.startsWith("[ERROR]"))
 
 // 4 formatLogMessages(logs):
-const formatLogMessages = (logs) => {
-    const formattedLogs = logs.map(msg => msg
-        .replace("[", "")
-        .replace("]", ": "))
-    return formattedLogs;
-};
+const formatLogMessages = logs => logs.map(msg => msg
+    .replace("[", "")
+    .replace("]", ": "));
 
 // 5 countErrorLogs(logs):
-const countErrorLogs = (logs) => {
+const countErrorLogs = logs => {
     const count = logs.reduce((num, msg) => {
         if (msg.startsWith('[ERROR]')) {
             return num + 1;
