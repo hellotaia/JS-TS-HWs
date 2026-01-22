@@ -9,27 +9,27 @@ const logMessages = [
 ];
 
 // 2 addLog(logs, newMessage):
-function addLog(logs, newMessage) {
+const addLog = (logs, newMessage) => {
     const x = [...logs, newMessage];
     return x;
-}
+};
 
 // 3 getErrorMessages(logs):
-function getErrorMessages(logs) {
+const getErrorMessages = (logs) => {
     const errorMessages = logs.filter(msg => msg.startsWith("[ERROR]"));
     return errorMessages;
-}
+};
 
 // 4 formatLogMessages(logs):
-function formatLogMessages(logs) {
+const formatLogMessages = (logs) => {
     const formattedLogs = logs.map(msg => msg
         .replace("[", "")
         .replace("]", ": "))
     return formattedLogs;
-}
+};
 
 // 5 countErrorLogs(logs):
-function countErrorLogs(logs) {
+const countErrorLogs = (logs) => {
     const count = logs.reduce((num, msg) => {
         if (msg.startsWith('[ERROR]')) {
             return num + 1;
@@ -37,7 +37,7 @@ function countErrorLogs(logs) {
         return num;
     }, 0);
     return count;
-}
+};
 
 // 6 Demonstration: After implementing the functions, write a sequence of calls to demonstrate they work correctly. 
 console.log('1. Initial array: ', logMessages);
