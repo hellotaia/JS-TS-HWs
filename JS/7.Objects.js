@@ -6,7 +6,7 @@ class User {
     }
 
     getUserInfo() {
-        return 'Name: ' + this.name + ', Email: ' + this.email;
+        return `Name: ${this.name}, Email: ${this.email}`;
     }
 }
 
@@ -21,7 +21,7 @@ class ShoppingCart {
         this.items.push(product);
     }
     getCartSummary() {
-        return 'Shopping cart for ' + this.user.name + ' has ' + this.items.length + ' items.'
+        return `Shopping cart for ${this.user.name} has ${this.items.length} items.`
     }
 }
 
@@ -35,5 +35,5 @@ const cart = new ShoppingCart(user)
 cart.addProduct({ name: 'Laptop', price: 1200.00 })
 cart.addProduct({ name: 'Phone', price: 555.12 })
 
-console.log(user.getUserInfo(user));
-console.log(cart.getCartSummary(cart));
+console.log(user.getUserInfo());
+console.log(cart.getCartSummary());
