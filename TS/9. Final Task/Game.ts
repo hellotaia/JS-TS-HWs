@@ -1,16 +1,16 @@
-import { createInterface } from "node:readline/promises";
-import { stdin as input, stdout as output } from "node:process";
+import { createInterface } from "readline/promises";
+import { stdin as input, stdout as output } from "process";
 
 import type { IPlanet, Event, ResourceType } from "./types.js";
-import { fuelPrices, getAllPlanets, getRandomEvent } from "./api.js";
+import { fuelPrices, getAllPlanets, getRandomEvent, pickRandom, phrases } from "./api.js";
 import { Player } from "./Player.js";
-const resTypes:ResourceType [] = ["sand","water","silver","gold","diamond","alienArtifact"];
+
+const resTypes: ResourceType[] = ["sand", "water", "silver", "gold", "diamond", "alienArtifact"];
 
 export class Game {
   private readline = createInterface({ input, output });
   private planets: IPlanet[] = [];
   private player: Player;
-
 
   constructor(player: Player) {
     this.player = player;
@@ -20,47 +20,116 @@ export class Game {
     const all = await getAllPlanets();
     this.planets = [...all].sort((a, b) => a.position - b.position);
 
+
+    console.log(`
+░█▄█░█▀█░█▀▀░█▀▀░░░█▀▀░█▀▀░█▀▀░█▀▀░█▀▀░▀█▀░░░░░░░░░█▀▀
+░█░█░█▀█░▀▀█░▀▀█░░░█▀▀░█▀▀░█▀▀░█▀▀░█░░░░█░░░░▄▄▄░░░▀▀▄
+░▀░▀░▀░▀░▀▀▀░▀▀▀░░░▀▀▀░▀░░░▀░░░▀▀▀░▀▀▀░░▀░░░░░░░░░░▀▀░
+  `);
     console.log("\n=== Cosmic Adventure ===\n");
-    console.log(`Welcome abroad, Captain ${this.player.name}`)
+    console.log(`Welcome, Captain ${this.player.name}!\n`);
+    console.log(`[GAME RULES]: \nPress numbers. Fly places. Fuel go bye-bye. 
+    Sometimes aliens show up.`);
+    console.log(`No fuel = you sad. Game over\n`)
 
     while (this.player.fuelLevel > 0) {
       this.printStatus();
-      this.printPlanetMenu();
 
-      const choice = await this.askNumber("\nPick a planet number (0 = quit): ");
-      if (choice === 0) break;
+      const action = await this.askMainMenu();
 
-      const target = this.planets[choice - 1];
-      if (!target) {
-        console.log("Wrong number\n");
+      if (action === 4) break;
+
+      if (action === 1) {
+        await this.travelMenu();
         continue;
       }
 
-      if (target.name === this.player.location.name) {
-        console.log("Come on, you're already here..)\n");
+      if (action === 2) {
+        await this.planetInfo();
         continue;
       }
 
-      await this.tryTravel(target);
+      if (action === 3) {
+        this.inventoryInfo();
+        continue;
+      }
+
+      console.log(`${pickRandom(phrases.chooseWrong)}\n`);
     }
 
-    console.log(this.player.fuelLevel <= 0 ? "\nOut of fuel. Game over." : "\nBye.");
+    console.log(this.player.fuelLevel <= 0 ? `\n${pickRandom(phrases.gameOver)}\nGame over./\nBye.` : `\n${pickRandom(phrases.quit)}\nBye.`);
     await this.readline.close();
   }
 
   private printStatus(): void {
-    console.log(`\nLocation: ${this.player.location.name} (${this.player.location.position})`);
+    console.log(`\nCurrent location: ${this.player.location.name} (${this.player.location.position})`);
     console.log(`Fuel: ${this.player.fuelLevel}`);
-    console.log(`Inventory: ${this.player.currentInventory()}`);
   }
 
-  private printPlanetMenu(): void {
-    console.log("\n---Choose your destination: ");
+  private async askMainMenu(): Promise<number> {
+    console.log("\n--- Main menu ---");
+    console.log("1) Where to travel");
+    console.log("2) Planet info");
+    console.log("3) Resources info");
+    console.log("4) Quit");
+
+    return this.askNumber("Choose (1-4): ");
+  }
+
+  private async travelMenu(): Promise<void> {
+    while (true) {
+      console.log("\n--- Choose your destination ---");
+      this.printPlanetList();
+
+      const choice = await this.askNumber("\nPick a planet number (0 = back): ");
+      if (choice === 0) return;
+
+      const target = this.planets[choice - 1];
+      if (!target) {
+        console.log(`${pickRandom(phrases.chooseWrong)}\n`);
+        continue;
+      }
+
+      if (target.name === this.player.location.name) {
+        console.log(`${pickRandom(phrases.samePlanet)}\n`);
+        continue;
+      }
+
+      await this.tryTravel(target);
+      return;
+    }
+  }
+
+  private async planetInfo(): Promise<void> {
+    console.log("\n--- Planet info ---");
+    console.log(`\n[PLANET INFO]: \nName: ${this.player.location.name}`);
+    console.log(`Position: ${this.player.location.position}`);
+    console.log(`Description: ${this.player.location.description ?? "No description"}`);
+    console.log("");
+  }
+
+  private inventoryInfo(): void {
+    console.log(`\n--- ${this.player.name}'s Resources: ---`);
+    console.log(this.player.currentInventory());
+
+    console.log(
+      `Prices (fuel per 1): sand=${fuelPrices.sand}, water=${fuelPrices.water}, silver=${fuelPrices.silver}, gold=${fuelPrices.gold}, diamond=${fuelPrices.diamond}, alienArtifact=${fuelPrices.alienArtifact}`
+    );
+
+    let totalValue = 0;
+    for (const t of resTypes) {
+      totalValue += this.player.inventory[t] * fuelPrices[t];
+    }
+
+    console.log(`If you sell ALL your resources to trader: +${totalValue} fuel\n`);
+  }
+
+  private printPlanetList(): void {
     for (let i = 0; i < this.planets.length; i++) {
       const p = this.planets[i]!;
       const cost = Math.abs(p.position - this.player.location.position);
       const here = p.name === this.player.location.name ? "  <-- you are here" : "";
-      console.log(`${i + 1}) ${p.name} [position = ${p.position}] cost = ${cost}${here}`);
+      console.log(`${i + 1}) ${p.name} [pos=${p.position}] cost=${cost}${here}`);
     }
   }
 
@@ -69,7 +138,7 @@ export class Game {
     const num = Number(raw);
 
     if (!Number.isFinite(num) || !Number.isInteger(num)) {
-      console.log("It is not integer\n");
+      console.log("Incorrect format. Should be integer.\n");
       return this.askNumber(text);
     }
 
@@ -80,13 +149,12 @@ export class Game {
     const cost = Math.abs(target.position - this.player.location.position);
 
     if (cost > this.player.fuelLevel) {
-      console.log(`Not enough fuel. We need ${cost}, but have only ${this.player.fuelLevel}.\n`);
+      console.log(`${pickRandom(phrases.notEnoughFuel)}. \nWe need ${cost}, but have only ${this.player.fuelLevel}.\n`);
       return;
     }
 
-    console.log(`Traveling to ${target.name} (cost ${cost})...`);
+    console.log(`\nTraveling to ${target.name} (cost ${cost})...`);
     this.player.destinationTarget(target);
-    console.log(`Arrived at ${target.name}.`);
 
     const evnt = await getRandomEvent(target.name);
     await this.applyEvent(evnt);
@@ -95,41 +163,35 @@ export class Game {
 
   private async applyEvent(evnt: Event): Promise<void> {
     if (evnt.kind === "nothing") {
-      console.log("\n[EVENT]: Nothing happened");
+      console.log(`\n[EVENT]: ${pickRandom(phrases.nothing)}`);
       return;
     }
 
     if (evnt.kind === "malfunction") {
-      console.log(`\n[EVENT]: Malfunction! Fuel leak: -${evnt.leak}`);
+      console.log(`\n[EVENT]: ${pickRandom(phrases.malfunction)} Fuel leak: -${evnt.leak}`);
       this.player.fuelLeak(evnt.leak);
       return;
     }
 
     if (evnt.kind === "resources") {
-      console.log("\n[EVENT] You found resources:");
+      console.log(`\n[EVENT][RESOURCES]: ${pickRandom(phrases.resources)}`);
       for (const d of evnt.drop) {
         this.player.addResource(d.type, d.amount);
-        console.log(`- ${d.amount} ${d.type} (value: ${fuelPrices[d.type]} fuel each)`);
+        console.log(`- ${d.amount} ${d.type} (value: ${fuelPrices[d.type]} fuel for each)`);
       }
       return;
     }
 
-    console.log("WOW! Its friendly alien trader! Trade resources for fuel.");
+    console.log(`\n[EVENT][TRADER] ${pickRandom(phrases.trader)} Trade resources for fuel.`);
     await this.traderMenu();
   }
 
   private async traderMenu(): Promise<void> {
     while (true) {
       console.log(`\nFuel: ${this.player.fuelLevel}`);
-      console.log(`Inventory: ${this.player.currentInventory()}`);
+      console.log(this.player.currentInventory());
       console.log(
-        `Prices: 
-        sand=${fuelPrices.sand}, 
-        water=${fuelPrices.water}, 
-        silver=${fuelPrices.silver},
-        gold=${fuelPrices.gold},
-        diamond=${fuelPrices.diamond},
-        alienArtifact=${fuelPrices.alienArtifact}`
+        `Prices: sand=${fuelPrices.sand}, water=${fuelPrices.water}, silver=${fuelPrices.silver}, gold=${fuelPrices.gold}, diamond=${fuelPrices.diamond}, alienArtifact=${fuelPrices.alienArtifact}`
       );
 
       console.log("\nTrader menu:");
@@ -140,23 +202,25 @@ export class Game {
       const choice = await this.askNumber("Choose: ");
 
       if (choice === 0) return;
+
       if (choice === 2) {
         const gained = this.sellAll();
-        console.log(gained > 0 ? `Sold all for +${gained} fuel.` : "Nothing valuable to sell.");
+        console.log(gained > 0 ? `\nSold all for +${gained} fuel.` : `${pickRandom(phrases.sellNothing)}`);
         continue;
       }
+
       if (choice === 1) {
         await this.sellSpecific();
         continue;
       }
 
-      console.log("Wrong. wrong. wrong. Try again");
+      console.log(`${pickRandom(phrases.chooseWrong)}`);
     }
   }
 
   private async sellSpecific(): Promise<void> {
     console.log("\nPick resource type:");
-    
+
     for (let i = 0; i < resTypes.length; i++) {
       const t = resTypes[i]!;
       console.log(`${i + 1}) ${t} (price ${fuelPrices[t]})`);
@@ -168,7 +232,7 @@ export class Game {
 
     const type = resTypes[pick - 1];
     if (!type) {
-      console.log("Wrong. Wrong. wrong. \n");
+      console.log("Wrong.\n");
       return;
     }
 
@@ -189,7 +253,7 @@ export class Game {
     const gainedFuel = amount * fuelPrices[type];
     this.player.addFuel(gainedFuel);
 
-    console.log(`Sold ${amount} ${type} for +${gainedFuel} fuel.`);
+    console.log(`\nSold ${amount} ${type} for +${gainedFuel} fuel.`);
   }
 
   private sellAll(): number {

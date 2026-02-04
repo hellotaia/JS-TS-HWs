@@ -1,6 +1,6 @@
-import { IPlanet, Event, ResourceType } from "./types";
+import { IPlanet, Event, ResourceType } from "./types.js";
 
-export function fetchData<T> (valueFactory: () => T, delay= 200): Promise<T> {
+export async function fetchData<T>(valueFactory: () => T, delay = 200): Promise<T> {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve(valueFactory());
@@ -9,42 +9,51 @@ export function fetchData<T> (valueFactory: () => T, delay= 200): Promise<T> {
 }
 
 export const planets: IPlanet[] = [
-    {name: "Earth", 
-        position: 0, 
+    {
+        name: "Earth",
+        position: 0,
         description: "Home. Blue planet full of life."
     },
-    {name: "Venus", 
-        position: 10, 
+    {
+        name: "Venus",
+        position: 10,
         description: "The hottest planet, covered in thick, heat-trapping clouds"
     },
-    { name: "Mars", 
+    {
+        name: "Mars",
         position: 20,
-        description: "The Red Planet, known for its iron-rich soil, large volcanoes, and thin atmosphere" 
+        description: "The Red Planet, known for its iron-rich soil, large volcanoes, and thin atmosphere"
     },
-    { name: "Mercury", 
-    position: 30,
-    description: "The smallest planet, closest to the Sun, with a rocky, cratered surface"
+    {
+        name: "Mercury",
+        position: 30,
+        description: "The smallest planet, closest to the Sun, with a rocky, cratered surface"
     },
-    { name: "Jupiter", 
-    position: 40,
-    description: "The largest planet, a gas giant known for its Great Red Spot and many moons"
+    {
+        name: "Jupiter",
+        position: 40,
+        description: "The largest planet, a gas giant known for its Great Red Spot and many moons"
     },
-    { name: "Saturn",
-    position: 50,
-    description: "A gas giant famous for its extensive, bright ring system"
+    {
+        name: "Saturn",
+        position: 50,
+        description: "A gas giant famous for its extensive, bright ring system"
     },
-    { name: "Uranus", 
-    position: 60,
-    description: "An ice giant that rotates on its side with a distinct blue-green color"
+    {
+        name: "Uranus",
+        position: 60,
+        description: "An ice giant that rotates on its side with a distinct blue-green color"
     },
-    { name: "Neptune",
-    position: 70,
-    description: "The most distant, cold, and windy ice giant"
+    {
+        name: "Neptune",
+        position: 70,
+        description: "The most distant, cold, and windy ice giant"
     },
-    {name: "Pluto", 
-    position: 80,
-    description: "Complex, icy world located in the Kuiper Belt beyond Neptune. Once the ninth planet, it is now the most famous dwarf planet in our solar system"
-}
+    {
+        name: "Pluto",
+        position: 80,
+        description: "Complex, icy world located in the Kuiper Belt beyond Neptune. Once the ninth planet, it is now the most famous dwarf planet in our solar system"
+    }
 ];
 
 
@@ -55,11 +64,11 @@ function getRandom(min: number, max: number): number {
 //Resources and Prices
 export const fuelPrices: Record<ResourceType, number> = {
     sand: 0,
-    water:1,
-    silver:2, 
-    gold:3,
-    diamond:5,
-    alienArtifact:20
+    water: 1,
+    silver: 2,
+    gold: 3,
+    diamond: 5,
+    alienArtifact: 20
 };
 
 function getDropsAmount(): number {
@@ -91,14 +100,14 @@ function getRandomResourceAmount(type: ResourceType): number {
 
 //Planets
 export function getAllPlanets(): Promise<IPlanet[]> {
-  return fetchData(() => planets, 120);
+    return fetchData(() => planets, 120);
 }
 export function getAvailablePlanets(currentPlanetName: string): Promise<IPlanet[]> {
-  return fetchData(() => planets.filter(p => p.name !== currentPlanetName), 120);
+    return fetchData(() => planets.filter(p => p.name !== currentPlanetName), 120);
 }
-export function findPlanetByName(name: string): Promise<IPlanet | undefined> {
-  return fetchData(() => planets.find((p) => p.name.toLowerCase() === name.toLowerCase()), 120);
-} 
+export async function findPlanetByName(name: string): Promise<IPlanet | undefined> {
+    return fetchData(() => planets.find((p) => p.name.toLowerCase() === name.toLowerCase()), 120);
+}
 
 //Events
 
@@ -131,4 +140,118 @@ export function getRandomEvent(planetName: string): Promise<Event> {
         const leak = getRandom(3, 20);
         return { kind: "malfunction", leak };
     }, 100);
+}
+
+//Phrases
+export const phrases = {
+    //
+    nothing: [
+        "Nothing happened.",
+        "Still nothing happened.",
+        "Wow. Empty.",
+        "Space is doing space.",
+        "Cool. Air. Lots of air.",
+        "You blink. Nothing changes.",
+        "Empty moment achieved."
+    ],
+    //
+    malfunction: [
+        "Ship made a noise. Bad noise.",
+        "Oops. Fuel gone.",
+        "Something broke. Again.",
+        "Ship is tired. Fuel leaked.",
+        "You hear hissing. That was fuel.",
+        "Red light blinked. You panic. Fuel leaves.",
+        "Your ship coughed. It was expensive.",
+        "You press nothing. It breaks anyway.",
+        "The ship is held together by hope. Hope failed.",
+        "Maintenance is for losers. Now you pay."
+    ],
+    //
+    resources: [
+        "You found stuff.",
+        "Shiny trash detected.",
+        "This might be useful. Or not.",
+        "You found junk. You feel rich.",
+        "You grabbed space trash. Congrats.",
+        "Resource moment. Dopamine +1.",
+        "It sparkles. You take it.",
+        "You pick up things. Like a raccoon. Ew."
+    ],
+    //
+    trader: [
+        "Alien shows up.",
+        "Weird guy wants your junk.",
+        "Green dude. Bad smile.",
+        "Alien trading time. No refunds.",
+        "This feels unsafe.",
+        "Alien says: give trash. I say: give fuel.",
+        "Trade offer: your stuff for survival.",
+        "Alien capitalism activated."
+    ],
+    //
+    chooseWrong: [
+        "Wrong button. Try again.",
+        "No. Not that.",
+        "Numbers are hard, huh?",
+        "That choice makes no sense.",
+        "Invalid input.",
+        "Pick a real option.",
+        "Nope. Try again, captain."
+    ],
+    //
+    notEnoughFuel: [
+        "No fuel.",
+        "Nice try. No fuel.",
+        "Fuel = low. Plan = bad.",
+        "You forgot fuel. Again.",
+        "You can’t fly on confidence.",
+        "Your tank is empty.",
+        "Not enough fuel. Sit down.",
+        "You stare at the stars. They do not help. No fuel.",
+        "Walking is not an option.",
+        "You are grounded. In space."
+    ],
+    //
+    samePlanet: [
+        "You are already here.",
+        "Same planet. Same you.",
+        "No movement achieved.",
+        "Navigation level: potato.",
+        "Congrats. You travelled 0 meters.",
+        "You selected the same place. Again.",
+        "Big brain move. You stayed.",
+        "You tried to leave. You didn’t."
+    ],
+
+    //
+    gameOver: [
+        "No fuel.",
+        "You are stuck. Forever.",
+        "Space wins.",
+        "You drift. Slowly. Like your career.",
+        "Congratulations. You lost.",
+        "FAIL."
+    ],
+    //
+    quit: [
+        "Bye.",
+        "You quit.",
+        "Exit pressed. Respect.",
+        "Probably the right choice.",
+        "Bye-bye",
+        "You left before the ship did."
+    ],
+    sellNothing: [
+        "You have nothing to sell.",
+        "Empty pockets. Sad.",
+        "No trash. No fuel.",
+        "You tried to sell air. Alien left.",
+        "Nice inventory. It is zero.",
+        "You are poor.",
+        "Nothing valuable to sell"
+    ]
+} as const;
+export function pickRandom<T>(arr: readonly T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
 }

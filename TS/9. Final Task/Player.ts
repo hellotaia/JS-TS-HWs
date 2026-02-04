@@ -1,4 +1,5 @@
-import type { IPlanet, Inventory, ResourceType } from "./types";
+import type { IPlanet, Inventory, ResourceType } from "./types.js";
+import { planets } from "./api.js";
 
 export class Player {
     public name: string;
@@ -7,12 +8,12 @@ export class Player {
     public inventory: Inventory;
     public fuelCapacity: number;
 
-    constructor(name: string, fuelLevel: number, location: IPlanet){
+    constructor(name: string, fuelLevel: number, location: IPlanet) {
         this.name = name;
         this.location = location;
         this.fuelLevel = fuelLevel;
-        this.fuelCapacity = 100; // Assuming a default capacity
-        this.inventory = {sand:0, water:0, silver:0, gold:0, diamond:0, alienArtifact:0};
+        this.fuelCapacity = 100;
+        this.inventory = { sand: 0, water: 0, silver: 0, gold: 0, diamond: 0, alienArtifact: 0 };
     }
 
     public getTravelCost(destination: IPlanet): number {
@@ -29,9 +30,9 @@ export class Player {
         }
         this.fuelLevel -= price;
         this.location = destination;
-        console.log(`Traveled to ${destination.name}. Remaining fuel: ${this.fuelLevel}`);
+        console.log(`Arrived to ${destination.name}. Remaining fuel: ${this.fuelLevel}`);
     }
-    public addFuel (amount: number): void {
+    public addFuel(amount: number): void {
         this.fuelLevel += amount;
     }
 
@@ -52,7 +53,7 @@ export class Player {
         return true;
     }
 
-    public currentInventory(): string{
-        return `Inventory: ${this.inventory.sand} sand, ${this.inventory.water} water, ${this.inventory.silver} silver, ${this.inventory.gold} gold, ${this.inventory.diamond} diamond, ${this.inventory.alienArtifact} alien artifacts.`;
-        }
+    public currentInventory(): string {
+        return `${this.inventory.sand} sand, ${this.inventory.water} water, ${this.inventory.silver} silver, ${this.inventory.gold} gold, ${this.inventory.diamond} diamond, ${this.inventory.alienArtifact} alien artifacts.`;
+    }
 }
