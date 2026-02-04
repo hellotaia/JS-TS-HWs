@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Adventure - Space Exploration Game</title>
+    <meta name="description" content="Explore the solar system, collect resources, and trade with aliens in this cosmic adventure game">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    
+    <div class="game-container">
+        <!-- Header -->
+        <header class="game-header">
+            <pre class="ascii-logo">
+░█▄█░█▀█░█▀▀░█▀▀░░░█▀▀░█▀▀░█▀▀░█▀▀░█▀▀░▀█▀░░░░░░░░░█▀▀
+░█░█░█▀█░▀▀█░▀▀█░░░█▀▀░█▀▀░█▀▀░█▀▀░█░░░░█░░░░▄▄▄░░░▀▀▄
+░▀░▀░▀░▀░▀▀▀░▀▀▀░░░▀▀▀░▀░░░▀░░░▀▀▀░▀▀▀░░▀░░░░░░░░░░▀▀░
+            </pre>
+            <h1 class="game-title">Cosmic Adventure</h1>
+            <p class="game-subtitle">Explore the Solar System</p>
+        </header>
+
+        <!-- Status Panel -->
+        <div class="status-panel">
+            <div class="status-item">
+                <span class="status-icon">👨‍🚀</span>
+                <span class="status-label">Captain</span>
+                <span class="status-value" id="player-name">Sheppard</span>
+            </div>
+            <div class="status-item">
+                <span class="status-icon">🪐</span>
+                <span class="status-label">Location</span>
+                <span class="status-value" id="current-location">Earth</span>
+            </div>
+            <div class="status-item fuel-status">
+                <span class="status-icon">⛽</span>
+                <span class="status-label">Fuel</span>
+                <div class="fuel-bar-container">
+                    <div class="fuel-bar" id="fuel-bar"></div>
+                    <span class="fuel-text" id="fuel-level">100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Event Log -->
+            <div class="event-log-panel">
+                <h2 class="panel-title">📡 Mission Log</h2>
+                <div class="event-log" id="event-log">
+                    <div class="log-entry welcome">Welcome, Captain! Your cosmic adventure begins on Earth.</div>
+                    <div class="log-entry info">[GAME RULES]: Press buttons. Fly places. Fuel go bye-bye. Sometimes aliens show up.</div>
+                    <div class="log-entry warning">No fuel = you sad. Game over.</div>
+                </div>
+            </div>
+
+            <!-- Inventory Panel -->
+            <div class="inventory-panel">
+                <h2 class="panel-title">🎒 Cargo Bay</h2>
+                <div class="inventory-grid">
+                    <div class="inventory-item" data-resource="sand">
+                        <span class="resource-icon">🏜️</span>
+                        <span class="resource-name">Sand</span>
+                        <span class="resource-count" id="sand-count">0</span>
+                        <span class="resource-price">0⛽</span>
+                    </div>
+                    <div class="inventory-item" data-resource="water">
+                        <span class="resource-icon">💧</span>
+                        <span class="resource-name">Water</span>
+                        <span class="resource-count" id="water-count">0</span>
+                        <span class="resource-price">1⛽</span>
+                    </div>
+                    <div class="inventory-item" data-resource="silver">
+                        <span class="resource-icon">🥈</span>
+                        <span class="resource-name">Silver</span>
+                        <span class="resource-count" id="silver-count">0</span>
+                        <span class="resource-price">2⛽</span>
+                    </div>
+                    <div class="inventory-item" data-resource="gold">
+                        <span class="resource-icon">🥇</span>
+                        <span class="resource-name">Gold</span>
+                        <span class="resource-count" id="gold-count">0</span>
+                        <span class="resource-price">3⛽</span>
+                    </div>
+                    <div class="inventory-item" data-resource="diamond">
+                        <span class="resource-icon">💎</span>
+                        <span class="resource-name">Diamond</span>
+                        <span class="resource-count" id="diamond-count">0</span>
+                        <span class="resource-price">5⛽</span>
+                    </div>
+                    <div class="inventory-item" data-resource="alienArtifact">
+                        <span class="resource-icon">👽</span>
+                        <span class="resource-name">Artifact</span>
+                        <span class="resource-count" id="alienArtifact-count">0</span>
+                        <span class="resource-price">20⛽</span>
+                    </div>
+                </div>
+                <div class="inventory-total">
+                    <span>Total Value:</span>
+                    <span id="total-value">0⛽</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-panel">
+            <button class="action-btn travel-btn" id="travel-btn" onclick="game.openTravelMenu()">
+                <span class="btn-icon">🚀</span>
+                <span class="btn-text">Travel</span>
+            </button>
+            <button class="action-btn info-btn" id="info-btn" onclick="game.showPlanetInfo()">
+                <span class="btn-icon">ℹ️</span>
+                <span class="btn-text">Planet Info</span>
+            </button>
+            <button class="action-btn inventory-btn" id="inventory-btn" onclick="game.showInventoryInfo()">
+                <span class="btn-icon">📦</span>
+                <span class="btn-text">Resources</span>
+            </button>
+            <button class="action-btn restart-btn" id="restart-btn" onclick="game.restart()">
+                <span class="btn-icon">🔄</span>
+                <span class="btn-text">Restart</span>
+            </button>
+        </div>
+
+        <!-- Planet Selection Modal -->
+        <div class="modal" id="travel-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🌌 Choose Destination</h2>
+                    <button class="close-btn" onclick="game.closeModals()">&times;</button>
+                </div>
+                <div class="planet-list" id="planet-list">
+                    <!-- Planets will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Trader Modal -->
+        <div class="modal" id="trader-modal">
+            <div class="modal-content trader-content">
+                <div class="modal-header">
+                    <h2>👽 Space Trader</h2>
+                    <button class="close-btn" onclick="game.closeTrader()">&times;</button>
+                </div>
+                <p class="trader-greeting" id="trader-greeting">Weird guy wants your junk.</p>
+                <div class="trader-inventory" id="trader-inventory">
+                    <!-- Trade items will be generated here -->
+                </div>
+                <div class="trader-actions">
+                    <button class="action-btn sell-all-btn" onclick="game.sellAll()">
+                        <span class="btn-icon">💰</span>
+                        <span class="btn-text">Sell All</span>
+                    </button>
+                    <button class="action-btn leave-btn" onclick="game.closeTrader()">
+                        <span class="btn-icon">🚶</span>
+                        <span class="btn-text">Leave</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="modal" id="gameover-modal">
+            <div class="modal-content gameover-content">
+                <h2 class="gameover-title">💀 GAME OVER</h2>
+                <p class="gameover-message" id="gameover-message">You are stuck. Forever.</p>
+                <button class="action-btn restart-btn" onclick="game.restart()">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">Try Again</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
