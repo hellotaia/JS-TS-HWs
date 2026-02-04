@@ -161,6 +161,7 @@ export const phrases = {
         "Something broke. Again.",
         "Ship is tired. Fuel leaked.",
         "You hear hissing. That was fuel.",
+        "ЯРІК, БОЧОК ПОТІК",
         "Red light blinked. You panic. Fuel leaves.",
         "Your ship coughed. It was expensive.",
         "You press nothing. It breaks anyway.",
@@ -231,6 +232,7 @@ export const phrases = {
         "Space wins.",
         "You drift. Slowly. Like your career.",
         "Congratulations. You lost.",
+        "ГАБЕЛІ.",
         "FAIL."
     ],
     //

@@ -57,7 +57,7 @@ export class Game {
       console.log(`${pickRandom(phrases.chooseWrong)}\n`);
     }
 
-    console.log(this.player.fuelLevel <= 0 ? `\n${pickRandom(phrases.gameOver)}\nGame over./\nBye.` : `\n${pickRandom(phrases.quit)}\nBye.`);
+    console.log(this.player.fuelLevel <= 0 ? `\n${pickRandom(phrases.gameOver)}\nGame over.\nBye.` : `\n${pickRandom(phrases.quit)}\nBye.`);
     await this.readline.close();
   }
 
