@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime env files
+.env
+.env.local
+.env.*.local
+
+# TypeScript build info
+*.tsbuildinfo
+
+# TypeScript project outputs (adjust if you use a different outDir)
+TS/node_modules/
+TS/dist/
+TS/build/
+TS/*.js.map
+TS/**/*.js.map
+
+# Build folders
+dist/
+build/
+coverage/
+
+# Editor settings
+.vscode/
+*.code-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
