@@ -1,16 +1,21 @@
 function formatUser(user: { name: string; age: number; occupation?: string }): string {
   // This line will cause a runtime error if 'user.occupation' is undefined.
-  let summary: string;
-  if (!user.occupation) {
-    summary = `${user.name} (${user.age}) is currently unemployed.`;
-  }
-    else {
-  const occupationUpper = user.occupation!.toUpperCase();
-  summary = `${user.name} (${user.age}) works as a ${occupationUpper}.`;
-  }
+  
+  //   let summary: string;
+  //   if (!user.occupation) {
+  //     summary = `${user.name} (${user.age}) is currently unemployed.`;
+  //   }
+  //     else {
+  //   const occupationUpper = user.occupation!.toUpperCase();
+  //   summary = `${user.name} (${user.age}) works as a ${occupationUpper}.`;
+  //   }
+  //   return summary;
+  // }
+  let summary = (!user.occupation) ?
+    `${user.name} (${user.age}) is currently unemployed.` :
+    `${user.name} (${user.age}) works as a ${user.occupation!.toUpperCase()}.`;
   return summary;
 }
-
 const userWithOccupation = { name: "Alice", age: 30, occupation: "Engineer" };
 const userWithoutOccupation = { name: "Bob", age: 25 };
 
