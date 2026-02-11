@@ -9,21 +9,21 @@ interface UserProfile extends AccountDetails {
     creationDate: Date;
 }
 
-function summarizeUserProfile(up: UserProfile) {
-    if (up.email) {
+function summarizeUserProfile(userProfile: UserProfile) {
+    if (userProfile.email) {
         return `[USER WITH EMAIL]
     User Profile Info:
-    User ${up.username}
-    ID: ${up.id}
-    Email: ${up.email} 
-    Created: ${up.creationDate.toDateString()}`;
+    User ${userProfile.username}
+    ID: ${userProfile.id}
+    Email: ${userProfile.email} 
+    Created: ${userProfile.creationDate.toDateString()}`;
     }
     return `[USER WITHOUT EMAIL]
     User Profile Info:
-    User ${up.username}
-    ID: ${up.id}
+    User ${userProfile.username}
+    ID: ${userProfile.id}
     Email: [NO EMAIL IS ON FILE]
-    Created: ${up.creationDate.toDateString()}`;
+    Created: ${userProfile.creationDate.toDateString()}`;
 }
 const userWithEmail: UserProfile = {
     id: 101,

@@ -1,8 +1,8 @@
-function summarizeUserProfile(up) {
-    if (up.email) {
-        return "[USER WITH EMAIL]\n    User Profile Info:\n    User ".concat(up.username, "\n    ID: ").concat(up.id, "\n    Email: ").concat(up.email, " \n    Created: ").concat(up.creationDate.toDateString());
+function summarizeUserProfile(userProfile) {
+    if (userProfile.email) {
+        return "[USER WITH EMAIL]\n    User Profile Info:\n    User ".concat(userProfile.username, "\n    ID: ").concat(userProfile.id, "\n    Email: ").concat(userProfile.email, " \n    Created: ").concat(userProfile.creationDate.toDateString());
     }
-    return "[USER WITHOUT EMAIL]\n    User Profile Info:\n    User ".concat(up.username, "\n    ID: ").concat(up.id, "\n    Email: [NO EMAIL IS ON FILE]\n    Created: ").concat(up.creationDate.toDateString());
+    return "[USER WITHOUT EMAIL]\n    User Profile Info:\n    User ".concat(userProfile.username, "\n    ID: ").concat(userProfile.id, "\n    Email: [NO EMAIL IS ON FILE]\n    Created: ").concat(userProfile.creationDate.toDateString());
 }
 var userWithEmail = {
     id: 101,
@@ -18,3 +18,6 @@ var userWithoutEmail = {
 console.log(summarizeUserProfile(userWithEmail));
 console.log("--------------------------------------------------");
 console.log(summarizeUserProfile(userWithoutEmail));
+function logInfo(data) {
+    console.log(data);
+}
