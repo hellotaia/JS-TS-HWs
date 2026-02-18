@@ -63,8 +63,6 @@ export class TodoPage {
 
         })
 
-
-
     }
 
 
