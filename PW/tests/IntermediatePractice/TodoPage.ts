@@ -1,11 +1,11 @@
 import { APIRequestContext, Page, Locator } from "@playwright/test";
+import { time } from "node:console";
 
 export class TodoPage {
     readonly page: Page;
     readonly inputField: Locator;
     readonly activeItemCount: Locator;
     readonly todoItems: Locator;
-    readonly toggleAll: Locator;
     readonly apiUrl = "https://csharp-todo-backend.azurewebsites.net/api/v1/todo";
     readonly baseUrl = "https://todobackend.com/client/index.html?https://csharp-todo-backend.azurewebsites.net/api/v1/todo";
 
@@ -14,7 +14,6 @@ export class TodoPage {
         this.inputField = page.getByPlaceholder('What needs to be done?');
         this.todoItems = page.locator('#todo-list li');
         this.activeItemCount = page.locator('#todo-count strong');
-        this.toggleAll = page.locator('#toggle-all');
     }
 
     async goto() {
@@ -35,6 +34,7 @@ export class TodoPage {
         // const before = await this.todoItems.count();
         await this.inputField.click();
         await this.inputField.fill(text);
+        await this.page.waitForTimeout(500);
         await this.inputField.press('Enter');
         // await expect(this.todoItems).toHaveCount(before + 1);
     }

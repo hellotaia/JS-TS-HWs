@@ -24,7 +24,6 @@ test('should allow a user to add and complete a to-do item', async ({ page }) =>
         .toHaveCount(1);
 
     await expect(todoPage.activeItemCount).toHaveText('3');
-
     await todoPage.markAsComplete('Write a test');
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
         .toBeVisible();
@@ -35,20 +34,21 @@ test('should allow a user to add and complete a to-do item', async ({ page }) =>
     await todoPage.filterBy('Active');
     // await expect(page).toHaveURL(/#\/active/);
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
-        .toHaveCount(0);
-    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
-        .toBeVisible();
-    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
-        .toBeVisible();
+        .toHaveClass('completed hidden');
+    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' })).not
+        .toHaveClass('completed hidden');
+    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' })).not
+        .toHaveClass('completed hidden');
+
 
     await todoPage.filterBy('Completed');
     // await expect(page).toHaveURL(/#\/completed/);
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
-        .toBeVisible();
+        .toHaveClass('completed');
     await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
-        .toBeHidden();
+        .toHaveClass('hidden');
     await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
-        .toHaveCount(0);
+        .toHaveClass('hidden');
 });
 
 test('should load the page with mocked to-do item', async ({ page }) => {
@@ -66,8 +66,17 @@ test('should not add a to-do if the server returns an error', async ({ page }) =
     await todoPage.serverMockError();
     await todoPage.goto();
     await todoPage.addTodo('This should fail');
+
+    const response = await page.waitForResponse(
+        response =>
+            response.url() === todoPage.apiUrl
+            && response.request().method() === 'POST'
+    );
+    expect(response.status()).toBe(500);
+
+    await page.reload();
     await expect(todoPage.todoItems
         .filter({ hasText: 'This should fail' })).toHaveCount(0);
-
+    await expect(todoPage.todoItems).toHaveCount(0);
 })
 
