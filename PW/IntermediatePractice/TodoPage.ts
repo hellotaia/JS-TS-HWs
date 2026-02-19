@@ -1,97 +1,78 @@
-import { Page, Locator } from "@playwright/test";
+import { APIRequestContext, Page, Locator } from "@playwright/test";
 
 export class TodoPage {
     readonly page: Page;
     readonly inputField: Locator;
-    readonly itemCount: Locator;
+    readonly activeItemCount: Locator;
     readonly todoItems: Locator;
-    readonly completedFilter: Locator;
-    readonly activeFilter: Locator;
-    readonly clearCompleted: Locator;
     readonly toggleAll: Locator;
-    readonly mockDataUrl = "**/api/todos";
+    readonly apiUrl = "https://csharp-todo-backend.azurewebsites.net/api/v1/todo";
     readonly baseUrl = "https://todobackend.com/client/index.html?https://csharp-todo-backend.azurewebsites.net/api/v1/todo";
 
-    constructor(page: Page) {
+    constructor(page: Page, private request: APIRequestContext) {
         this.page = page;
         this.inputField = page.getByPlaceholder('What needs to be done?');
         this.todoItems = page.locator('#todo-list li');
-        this.completedFilter = page.locator('#filters li a:has-text("Completed")');
-        this.activeFilter = page.locator('#filters li a:has-text("Active")');
-        this.clearCompleted = page.getByRole('button', { name: 'Clear completed' });
-        this.itemCount = page.locator('#todo-count strong');
+        this.activeItemCount = page.locator('#todo-count strong');
         this.toggleAll = page.locator('#toggle-all');
-
     }
 
     async goto() {
         await this.page.goto(this.baseUrl);
     }
 
+    async clearTodos() {
+        const getResponse = await this.request.get(this.apiUrl);
+        const body = await getResponse.json();
+        if (!Array.isArray(body) || body.length === 0) return;
+        for (const todo of body) {
+            await this.request.delete(`${this.apiUrl}/${todo.id}`);
+        }
+    }
+
+
     async addTodo(text: string) {
+        // const before = await this.todoItems.count();
         await this.inputField.click();
         await this.inputField.fill(text);
         await this.inputField.press('Enter');
+        // await expect(this.todoItems).toHaveCount(before + 1);
     }
+
     async markAsComplete(todoText: string): Promise<void> {
-        await this.page.locator(`#todo-list li:has-text("${todoText}") .toggle`).check();
+        await this.page.locator(`#todo-list li:has-text("${todoText}") .toggle`)
+            .click();
     }
+
     async filterBy(status: 'Active' | 'Completed') {
-        await this.page.locator(`#filters li a:has-text("${status}")`).click();
-    }
-    async route() {
-        await this.page.route(this.mockDataUrl, route => {
-            route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    "todos": [
-                        {
-                            id: 1,
-                            title: 'Mocked Task 1',
-                            completed: false
-                        },
-                        {
-                            id: 2,
-                            title: 'Mocked Task 2',
-                            completed: true
-                        }
-                    ]
-                })
-            })
-
-
-        })
+        await this.page.getByRole('link', { name: status }).click();
 
     }
-
 
     async setupMockTodos() {
-        const mockData = {
-            "todos": [
-                {
-                    id: 1,
-                    title: 'Mocked Task 1',
-                    completed: false
-                },
-                {
-                    id: 2,
-                    title: 'Mocked Task 2',
-                    completed: true
-                }
-            ]
-        };
-
-        await this.page.route(this.mockDataUrl, route => {
+        await this.page.route(this.apiUrl, route => {
             route.fulfill({
-                json: mockData,
                 status: 200,
-                contentType: 'application/json'
+                json: [
+                    { id: "1", title: 'Mocked Task 1', completed: false },
+                    { id: "2", title: 'Mocked Task 2', completed: true }
+                ]
             })
+        });
+    }
 
+    async serverMockError() {
+        await this.page.route(this.apiUrl, route => {
+            const request = route.request();
+            if (request.method() === 'POST') {
 
-        })
-
+                return route.fulfill({
+                    status: 500,
+                    body: 'Server Error'
+                })
+            }
+            route.continue();
+        });
     }
 
 }

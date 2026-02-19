@@ -5,56 +5,69 @@ import { TodoPage } from './TodoPage';
 let todoPage: TodoPage;
 
 
-test.beforeEach(async ({ page }) => {
-    todoPage = new TodoPage(page);
-    await todoPage.goto();
+test.beforeEach(async ({ page, request }) => {
 
-
-    const count = await todoPage.todoItems.count();
-    if (count === 0) return;
-    await expect(todoPage.toggleAll).toBeVisible();
-    await todoPage.toggleAll.setChecked(true);
-    await expect(todoPage.clearCompleted).toBeVisible();
-    await todoPage.clearCompleted.click();
-    await expect(todoPage.todoItems).toHaveCount(0);
+    todoPage = new TodoPage(page, request);
+    await todoPage.clearTodos();
 });
 
 test('should allow a user to add and complete a to-do item', async ({ page }) => {
+    await todoPage.goto();
     await todoPage.addTodo('Create a POM');
+    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
+        .toHaveCount(1);
     await todoPage.addTodo('Write a test');
+    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
+        .toHaveCount(1);
     await todoPage.addTodo('Run the test');
+    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
+        .toHaveCount(1);
 
-    await expect(todoPage.itemCount).toHaveText('3');
+    await expect(todoPage.activeItemCount).toHaveText('3');
 
     await todoPage.markAsComplete('Write a test');
-    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' })).toBeVisible();
-    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' })).toHaveClass(/completed/);
-    await todoPage.completedFilter.click();
+    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
+        .toBeVisible();
+    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
+        .toHaveClass(/completed/);
 
 
     await todoPage.filterBy('Active');
-    await expect(todoPage.itemCount).toHaveText('2');
-    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' })).toBeHidden();
-    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' })).toHaveText('Create a POM');
-    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' })).toHaveText('Run the test');
+    // await expect(page).toHaveURL(/#\/active/);
+    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
+        .toHaveCount(0);
+    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
+        .toBeVisible();
+    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
+        .toBeVisible();
 
     await todoPage.filterBy('Completed');
-    //await expect(todoPage.todoItems.filter({ hasText: 'Write a test' })).toBeVisible();
-    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' })).toHaveText('Write a test');
+    // await expect(page).toHaveURL(/#\/completed/);
+    await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
+        .toBeVisible();
+    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
+        .toBeHidden();
+    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
+        .toHaveCount(0);
 });
 
-// test('should load the page with mocked to-do item', async ({ page }) => {
-//     page.on('request', r => console.log(r.method(), r.url()))
-//     await todoPage.setupMockTodos();
-//     await todoPage.goto();
-//     await expect(todoPage.itemCount).toHaveCount(2);
-//     await expect(todoPage.itemCount.filter({ hasText: 'Mocked Task 2' }).locator('.todo-list li.completed')).toHaveText('Mocked Task 2');
-// })
+test('should load the page with mocked to-do item', async ({ page }) => {
+    await todoPage.setupMockTodos();
+    await todoPage.goto();
+    await expect(todoPage.todoItems).toHaveCount(2);
+    await expect(todoPage.todoItems.filter({ hasText: 'Mocked Task 2' }))
+        .toHaveClass(/completed/);
+    await expect(todoPage.todoItems).toContainText(
+        ['Mocked Task 1', 'Mocked Task 2']
+    );
+})
 
-// test('should not add a to-do if the server returns an error', async ({ page }) => {
-//     page.on('request', r => console.log(r.method(), r.url()))
-//     await page.route('**/api/todos', route => route.fulfill({ status: 500 }));
-//     await todoPage.addTodo('Create a POM');
-//     await expect(todoPage.itemCount).toHaveCount(0);
+test('should not add a to-do if the server returns an error', async ({ page }) => {
+    await todoPage.serverMockError();
+    await todoPage.goto();
+    await todoPage.addTodo('This should fail');
+    await expect(todoPage.todoItems
+        .filter({ hasText: 'This should fail' })).toHaveCount(0);
 
-// })
+})
+
