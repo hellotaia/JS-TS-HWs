@@ -1,17 +1,24 @@
-import { Page } from "playwright-core";
+import { expect, Locator, Page } from "@playwright/test";
 
 export class NotesPage {
-    private page: Page;
+    readonly page: Page;
+    readonly uiUrl = 'https://practice.expandtesting.com/notes/app';
 
     constructor(page: Page) {
         this.page = page;
     }
 
     async goto() {
-        //await this.page.goto('https://practice.expandtesting.com/notes/app');
+        await this.page.goto(this.uiUrl,
+            { waitUntil: 'domcontentloaded' });
     }
 
-    async createNote(title: string, description: string) {
-        await this.page.getByRole('button', { name: 'New Note' }).click();
+    async getNoteByTitle(title: string): Promise<Locator> {
+        const noteCard = this.page.getByText(title);
+        return noteCard;
+    }
+
+    async assertNoteDetails(noteLocator: Locator, expectedDetails: { description: string }) {
+        await expect(noteLocator).toContainText(expectedDetails.description);
     }
 }

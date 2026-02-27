@@ -1,0 +1,45 @@
+{
+  "cookies": [
+    {
+      "name": "express:sess",
+      "value": "eyJmbGFzaCI6e319",
+      "domain": "practice.expandtesting.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "express:sess.sig",
+      "value": "tdt42nQZiQvICqmrvHQ1_16fHk0",
+      "domain": "practice.expandtesting.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_90GRT6N40B",
+      "value": "GS2.1.s1772210640$o1$g0$t1772210640$j60$l0$h0",
+      "domain": ".expandtesting.com",
+      "path": "/",
+      "expires": 1806770640.898037,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.849312125.1772210641",
+      "domain": ".expandtesting.com",
+      "path": "/",
+      "expires": 1806770640.898836,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}
