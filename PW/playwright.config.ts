@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'node:path';
 
 /**
  * Read environment variables from file.
@@ -25,20 +26,24 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   globalSetup: require.resolve('./tests/AdvancePractice/global.setup.ts'),
+  globalTeardown: require.resolve('./tests/AdvancePractice/global.teardown.ts'),
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    storageState: './tests/AdvancePractice/storageState.json',
+    storageState: path.resolve('./tests/AdvancePractice/storageState.json'),
   },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: path.resolve('./tests/AdvancePractice/storageState.json'),
+      }
     },
 
     // {

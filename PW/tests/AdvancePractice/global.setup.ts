@@ -1,46 +1,52 @@
 import { request, chromium } from '@playwright/test';
 import * as fs from 'fs';
+import * as path from 'path';
 
 async function globalSetup() {
     const apiUrl = 'https://practice.expandtesting.com/notes/api/';
     const uiUrl = 'https://practice.expandtesting.com/notes/app';
+    const ssPath = path.resolve('./tests/AdvancePractice/storageState.json');
+    const tdPath = path.resolve('./tests/AdvancePractice/test-data.json');
 
-    const credentials = {
+
+    const creds = {
         name: `testuser${Date.now()}`,
         password: 'testpassword',
         email: `email${Date.now()}@gmail.com`
     };
-    const api = await request.newContext({ baseURL: apiUrl, });
 
-    //register
-    const registerRequest = await api.post(`users/register`, { data: credentials });
-    if (!registerRequest.ok()) {
+
+    // api register
+    const api = await request.newContext({ baseURL: apiUrl });
+    const reg = await api.post(`users/register`, { data: creds });
+    if (!reg.ok()) {
         throw new Error(
-            `Register failed: ${registerRequest.status()} ${await registerRequest.text()}`
+            `Register failed: ${reg.status()} ${await reg.text()}`
         );
     }
 
-    //login
-    const loginRequest = await api.post(`users/login`, {
+
+    //api login
+    const login = await api.post(`users/login`, {
         data: {
-            email: credentials.email,
-            password: credentials.password
+            email: creds.email,
+            password: creds.password
         }
     });
-    if (!loginRequest.ok()) {
+    if (!login.ok()) {
         throw new Error(
-            `Login failed: ${loginRequest.status()} ${await loginRequest.text()}`
+            `Login failed: ${login.status()} ${await login.text()}`
         );
     }
-    console.log('loginRequest', loginRequest);
 
     //token
-    const loginJson = await loginRequest.json();
+    const loginJson = await login.json();
     const token = loginJson.data.token;
     if (!token) throw new Error(
         `Token not found in login response: ${JSON.stringify(loginJson)}`
     );
 
+    // api creation note 
     const authContext = await request.newContext({
         baseURL: apiUrl,
         extraHTTPHeaders: {
@@ -49,11 +55,9 @@ async function globalSetup() {
         },
     });
 
-    // api creation note 
-    const noteTitle = `Note ${Date.now()}`;
-    const noteDescription = `Description ${Date.now()}`;
-
-    const noteRequest = await authContext.post(`notes`, {
+    const noteTitle = `API Test Note - ${Date.now()}`;
+    const noteDescription = `This note was created by an API -  ${Date.now()}`;
+    const noteCreate = await authContext.post(`notes`, {
         data: {
             title: noteTitle,
             description: noteDescription,
@@ -61,36 +65,47 @@ async function globalSetup() {
             completed: false
         }
     });
-    if (!noteRequest.ok()) {
+    if (!noteCreate.ok()) {
         throw new Error(
-            `Note creation failed: ${noteRequest.status()} ${await noteRequest.text()}`
+            `Note creation failed: ${noteCreate.status()} 
+            ${await noteCreate.text()}`
         );
     }
 
-    const noteJson = await noteRequest.json();
+    const noteJson = await noteCreate.json();
     const noteId = noteJson.data.id;
     if (!noteId) throw new Error(
-        `Note ID not found in note response: ${JSON.stringify(noteJson)}`
+        `Note ID not found: ${JSON.stringify(noteJson)}`
     );
-
-    console.log('noteId', noteId);
 
     //test-data creation
     const testData = {
-        credentials,
+        creds,
         token,
         noteId,
         noteTitle,
         noteDescription
     };
-    fs.writeFileSync('./tests/AdvancePractice/test-data.json', JSON.stringify(testData));
+    fs.writeFileSync(tdPath, JSON.stringify(testData));
 
-    //storage state
+    //UI login
     const browser = await chromium.launch();
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto(uiUrl, { waitUntil: 'domcontentloaded' });
-    await context.storageState({ path: './tests/AdvancePractice/storageState.json' });
+
+    await page.getByText('Login').click();
+    await page.getByTestId('login-email').fill(creds.email);
+    await page.getByTestId('login-password').fill(creds.password);
+    await page.getByTestId('login-submit').click();
+    await page.getByText('Logout').waitFor({
+        state: 'visible', timeout: 15000
+    });
+
+    //storage state
+    await context.storageState({
+        path: ssPath
+    });
 
     await browser.close();
     await api.dispose();
