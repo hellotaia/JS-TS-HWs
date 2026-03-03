@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { NotesPage } from './NotesPage';
 import * as fs from 'fs';
 import * as path from 'path';
-test.use({ storageState: './tests/AdvancePractice/storageState.json' });
+
 let notesPage: NotesPage;
 let testData: { noteTitle: string; noteDescription: string; noteId: string };
 
@@ -14,9 +14,23 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('should display the API-created note on the page', async () => {
+    //Navigate directly to the notes page
     await expect(notesPage.page).toHaveURL(notesPage.uiUrl);
-    await notesPage.getNoteByTitle(testData.noteTitle);
-    await notesPage.assertNoteDetails(notesPage.noteViewBtn, { description: testData.noteDescription });
+
+    //Use your NotesPage methods to find the note with the title "API Test Note"
+    const title = testData.noteTitle;
+    const note = await notesPage.getNoteByTitle(title);
+
+    //Assertion: Assert that the note is visible.
+    await expect(note).toBeVisible();
+
+
+    //Assertion: Use your page object to click the note and verify its description matches what you sent in the API call.
+    await notesPage.assertNoteDetails(
+        note, { description: testData.noteDescription }
+    );
+
+    //Assertion: the URL now includes the note ID
     await expect(notesPage.page).toHaveURL(`${notesPage.uiUrl}/notes/${testData.noteId}`);
 
 });

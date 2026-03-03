@@ -33,7 +33,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
-    storageState: path.resolve('./tests/AdvancePractice/storageState.json'),
+    // storageState: path.resolve('./tests/AdvancePractice/storageState.json'),
   },
 
   /* Configure projects for major browsers */
@@ -46,15 +46,21 @@ export default defineConfig({
       }
     },
 
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: path.resolve('./tests/AdvancePractice/storageState.json'),
+      },
+    },
 
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: path.resolve('./tests/AdvancePractice/storageState.json'),
+      },
+    },
 
     /* Test against mobile viewports. */
     // {
