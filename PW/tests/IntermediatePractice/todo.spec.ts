@@ -1,17 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { TodoPage } from './TodoPage';
 
-
 let todoPage: TodoPage;
 
-
 test.beforeEach(async ({ page, request }) => {
-
     todoPage = new TodoPage(page, request);
     await todoPage.clearTodos();
 });
 
-test('should allow a user to add and complete a to-do item', async ({ page }) => {
+test('should allow a user to add and complete a to-do item', async () => {// прибираємо що не використовується в тестах
     await todoPage.goto();
     await todoPage.addTodo('Create a POM');
     await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
@@ -22,27 +19,22 @@ test('should allow a user to add and complete a to-do item', async ({ page }) =>
     await todoPage.addTodo('Run the test');
     await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
         .toHaveCount(1);
-
     await expect(todoPage.activeItemCount).toHaveText('3');
     await todoPage.markAsComplete('Write a test');
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
         .toBeVisible();
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
         .toHaveClass(/completed/);
-
-
+                                                                        // якщо хочещ віддідлити логіку, то одного ентеру достатньо
     await todoPage.filterBy('Active');
-    // await expect(page).toHaveURL(/#\/active/);
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
         .toHaveClass('completed hidden');
-    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' })).not
-        .toHaveClass('completed hidden');
-    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' })).not
-        .toHaveClass('completed hidden');
-
-
+    await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
+        .not.toHaveClass('completed hidden');                           //переносимо отак
+    await expect(todoPage.todoItems.filter({ hasText: 'Run the test' }))
+        .not.toHaveClass('completed hidden');
+                                                                        // якщо хочещ віддідлити логіку, то одного ентеру достатньо
     await todoPage.filterBy('Completed');
-    // await expect(page).toHaveURL(/#\/completed/);
     await expect(todoPage.todoItems.filter({ hasText: 'Write a test' }))
         .toHaveClass('completed');
     await expect(todoPage.todoItems.filter({ hasText: 'Create a POM' }))
@@ -51,7 +43,7 @@ test('should allow a user to add and complete a to-do item', async ({ page }) =>
         .toHaveClass('hidden');
 });
 
-test('should load the page with mocked to-do item', async ({ page }) => {
+test('should load the page with mocked to-do item', async () => {// прибираємо що не використовується в тестах
     await todoPage.setupMockTodos();
     await todoPage.goto();
     await expect(todoPage.todoItems).toHaveCount(2);
@@ -62,7 +54,7 @@ test('should load the page with mocked to-do item', async ({ page }) => {
     );
 })
 
-test('should not add a to-do if the server returns an error', async ({ page }) => {
+test('should not add a to-do if the server returns an error', async ({ page }) => {//Чудова робота :)
     await todoPage.serverMockError();
     await todoPage.goto();
     await todoPage.addTodo('This should fail');
@@ -79,4 +71,3 @@ test('should not add a to-do if the server returns an error', async ({ page }) =
         .filter({ hasText: 'This should fail' })).toHaveCount(0);
     await expect(todoPage.todoItems).toHaveCount(0);
 })
-
