@@ -53,12 +53,18 @@ export class TodoPage {
             route.fulfill({
                 status: 200,
                 json: [
-                    { id: "1", title: 'Mocked Task 1', completed: false },
+
                     //хоча це імітація, але краще щоб структура даних була максимально наближена до реальної
                     //підкажи як ти будувала модель мока для цього тесту?
                     // Чи дивилась ти реальну відповідь від сервера, щоб зрозуміти яку структуру даних потрібно замокати?
                     //якщо дивилась - зроби як реальна відповідь, якщо ні - напиши мені, покажу як це зробити
-                    { id: "2", title: 'Mocked Task 2', completed: true }
+
+                    // { id: "1", title: 'Mocked Task 1', completed: false },
+                    // { id: "2", title: 'Mocked Task 2', completed: true }
+
+                    //ВІДПОВІДЬ:так, замість айді повинен бути ордер, повинно бути так:
+                    { "title": "Mocked Task 1", "order": 1, "completed": false },
+                    { "title": "Mocked Task 2", "order": 2, "completed": true }
                 ]
             })
         });
